@@ -3,7 +3,7 @@ As per any CTF on Tryhackme make sure everything is up and running and the targe
 
 For this write up I will be using an attack box provided by Tryhackme however you can use your own machine if you want using OpenVPN (documentation on how to setup OVPN can be found on Tryhackme's beginners room)
 
-**[Upon finishing this CTF you will be awarded the Mr Robot CTF badge](https://tryhackme.com/UwUtisum/badges/mr-robot)**
+**[Upon finishing this CTF you will be awarded the Mr Robot CTF badge](https://tryhackme.com/UwUtisum/badges/mr-robot) **
 ## Recon:
 as per any pen testing challenge we will start by doing some basic recon on the site  
 to start I ran a simple nmap scan to see what services are running on the host
